@@ -4,16 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/TetroVolt/ATAT-IoT-example.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/TetroVolt/ATAT-IoT-example/issues"
   },
-  "homepage": "https://github.com/TetroVolt/ATAT-IoT-example#readme"
+  "homepage": "https://github.com/TetroVolt/ATAT-IoT-example#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
