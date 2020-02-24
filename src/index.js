@@ -1,6 +1,7 @@
 const express = require('express');
 const http = require('http');
 const socketio = require('socket.io');
+const net = require('net');
 
 function initDevApp() {
   const app = express();
@@ -15,31 +16,35 @@ function initDevApp() {
     res.sendFile(__dirname + '/index.html');
   });
 
-  io.on('connection', function(socket){
-    socket.on('chat message', function(msg){
-      io.emit('chat message', msg);
-    });
-  });
-
   return { app, httpServer, io };
 }
 
 const devApp = initDevApp();
-devApp.httpServer.listen(3001, () => {
-  console.log("Dev server listening on port 3001");
-})
 
-/*
-var server = net.createServer(function(socket) {
-  console.log("Client connected. ");
+devApp.io.on('connection', function(socket){
+  console.log('[Dev Server] developer connected.');
+  socket.on('disconnect', function() {
+    console.log('[Dev Server] developer disconnected.')
+  })
+});
 
-  socket.on('close', () => {
-    console.log("Client disconnected. ")
+var rfidServer = net.createServer(function(socket) {
+  console.log("[RFID Server] Client connected. ");
+
+  socket.on('end', () => {
+    console.log("[RFID Server] Client disconnected. ")
   })
 
-  socket.on
-
-  socket.write("Hello, World!\r\n");
-	socket.pipe(socket);
+  socket.on('data', (chunk) => {
+    console.log(`[RFID Server] received data from client: ${chunk.toString()}`);
+    devApp.io.emit('rfid event', chunk.toString());
+  })
 });
-*/
+
+devApp.httpServer.listen(3001, () => {
+  console.log("[Dev Server] listening on port 3001");
+})
+
+rfidServer.listen(3000, () => {
+  console.log("[RFID server] listening on port 3000")
+})
