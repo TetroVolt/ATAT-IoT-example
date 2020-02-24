@@ -1,24 +1,45 @@
-var app = require('express')();
-var http = require('http').createServer(app);
-var io = require('socket.io')(http);
+const express = require('express');
+const http = require('http');
+const socketio = require('socket.io');
 
-const PORT = 3000
+function initDevApp() {
+  const app = express();
+  const httpServer = http.createServer(app);
+  const io = socketio(httpServer);
 
-app.get('/', (request, response) => {
-  console.log("Received request: ", request);
-  response.sendStatus(200);
+  app.get('/health', function(req, res){
+    res.sendStatus(200);
+  });
+
+  app.get('/', function(req, res){
+    res.sendFile(__dirname + '/index.html');
+  });
+
+  io.on('connection', function(socket){
+    socket.on('chat message', function(msg){
+      io.emit('chat message', msg);
+    });
+  });
+
+  return { app, httpServer, io };
+}
+
+const devApp = initDevApp();
+devApp.httpServer.listen(3001, () => {
+  console.log("Dev server listening on port 3001");
 })
 
-app.get('/health', (request, response) => {
-  console.log("Received health check from: ", request);
-  response.sendStatus(200);
-})
+/*
+var server = net.createServer(function(socket) {
+  console.log("Client connected. ");
 
-io.on('connection', function(socket) {
-  console.log("Socket connection received.");
-  socket.send("Hello, World");
-})
+  socket.on('close', () => {
+    console.log("Client disconnected. ")
+  })
 
-http.listen(PORT, function(){
-  console.log('listening on *:3000');
+  socket.on
+
+  socket.write("Hello, World!\r\n");
+	socket.pipe(socket);
 });
+*/
